@@ -19,7 +19,7 @@ export default function App() {
   const [focusedWidget, setFocusedWidget] = useState(null);
 
   const col1Widgets = ['camera', 'performance', 'nav_readings'];
-  const col2Widgets = ['floor_maps', 'robot', 'slam']; // Reordered and removed 'orientation'
+  const col2Widgets = ['floor_maps', 'robot', 'slam'];
   const col3Widgets = ['voice', 'status', 'controls'];
 
   const getColumnClass = (colWidgets) => {
@@ -55,7 +55,6 @@ export default function App() {
         </div>
 
         <div className={`flex flex-col gap-6 transition-all duration-500 ${getColumnClass(col2Widgets)}`}>
-          {/* Floor Maps moved to top, Orientation removed */}
           <FloorMaps setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
           <RobotImage setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
           <SlamMap setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
@@ -98,20 +97,25 @@ const DisclaimerNote = () => (
   </div>
 );
 
+// Updated Header Component
 const Header = () => (
-    <header className="w-full grid grid-cols-3 items-center p-4 rounded-xl bg-slate-900/50 backdrop-blur-sm border border-slate-700/80 mb-6">
-      <div className="text-left text-lg">
+    <header className="w-full grid grid-cols-1 md:grid-cols-3 items-center gap-y-4 md:gap-y-0 p-4 rounded-xl bg-slate-900/50 backdrop-blur-sm border border-slate-700/80 mb-6">
+      <div className="text-center md:text-left text-lg order-2 md:order-1">
         <span className="text-slate-300 font-semibold">Status:</span>
         <span className="text-[#b968c7] ml-2 font-bold">Connected</span>
       </div>
       
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-slate-100" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+      <div className="text-center order-1 md:order-2">
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-100" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
           ENIGMA_X
         </h1>
+        {/* This is the updated line */}
+        <p className="text-xs font-semibold text-slate-200 mt-1 leading-tight tracking-wider">
+            Team ID: 93071
+        </p>
       </div>
       
-      <div className="text-right text-lg">
+      <div className="text-center md:text-right text-lg order-3 md:order-3">
         <span className="text-slate-300 font-semibold">Time:</span>
         <span className="text-[#00bcd4] ml-2 font-bold">02:15</span>
       </div>
@@ -264,7 +268,7 @@ const FloorMaps = (props) => {
   };
   return (
     <WidgetPanel title="Floor Maps" widgetName="floor_maps" {...props}>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {floorImages.map((img, i) => (
           <img
             key={`floor-${i}`}
@@ -284,7 +288,7 @@ const ManualControls = (props) => {
     return (
         <WidgetPanel title="Manual Control" widgetName="controls" {...props}>
             <div className="flex items-center justify-center h-full">
-                <div className="grid grid-cols-3 gap-2 w-40">
+                <div className="grid grid-cols-3 gap-2 w-48 max-w-full">
                     <div></div>
                     <button onClick={() => sendCommand('FORWARD')} className="bg-slate-700 hover:bg-cyan-500 rounded p-4 text-xl">↑</button>
                     <div></div>
@@ -300,7 +304,6 @@ const ManualControls = (props) => {
     )
 }
 
-// Updated NavigationReadings component
 const NavigationReadings = (props) => {
     const initialMetrics = [
         { name: "YDLIDAR X2", value: 0, max: 12 },
