@@ -18,7 +18,7 @@ const generateDummyData = () => {
 export default function App() {
   const [focusedWidget, setFocusedWidget] = useState(null);
 
-  const col1Widgets = ['camera', 'performance', 'nav_readings'];
+  const col1Widgets = ['description', 'camera', 'performance', 'nav_readings'];
   const col2Widgets = ['floor_maps', 'robot', 'slam'];
   const col3Widgets = ['voice', 'status', 'controls'];
 
@@ -49,6 +49,7 @@ export default function App() {
       <main className="flex-grow flex flex-col md:flex-row gap-6">
         
         <div className={`flex flex-col gap-6 transition-all duration-500 ${getColumnClass(col1Widgets)}`}>
+          <RobotDescription setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
           <CameraFeed setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
           <SystemPerformance setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
           <NavigationReadings setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
@@ -72,10 +73,20 @@ export default function App() {
 }
 
 // === WIDGET WRAPPER ===
-const WidgetPanel = ({ title, children, focusedWidget, setFocusedWidget, widgetName }) => (
+const WidgetPanel = ({ title, children, focusedWidget, setFocusedWidget, widgetName, description }) => (
   <div className="bg-slate-900/40 backdrop-blur-sm p-4 rounded-xl border border-slate-700/80 flex flex-col h-full">
     <div className="flex justify-between items-center mb-2">
-      <h2 className="text-lg text-white font-semibold">{title}</h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-lg text-white font-semibold">{title}</h2>
+        {description && (
+          <div className="relative group">
+            <span className="text-slate-400 cursor-help">ℹ️</span>
+            <div className="absolute bottom-full z-10 mb-2 w-64 p-2 bg-slate-800 border border-slate-600 rounded-md text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              {description}
+            </div>
+          </div>
+        )}
+      </div>
       {widgetName && (
         <button 
           onClick={() => setFocusedWidget(focusedWidget === widgetName ? null : widgetName)} 
@@ -97,24 +108,20 @@ const DisclaimerNote = () => (
   </div>
 );
 
-// Updated Header Component
 const Header = () => (
     <header className="w-full grid grid-cols-1 md:grid-cols-3 items-center gap-y-4 md:gap-y-0 p-4 rounded-xl bg-slate-900/50 backdrop-blur-sm border border-slate-700/80 mb-6">
       <div className="text-center md:text-left text-lg order-2 md:order-1">
         <span className="text-slate-300 font-semibold">Status:</span>
         <span className="text-[#b968c7] ml-2 font-bold">Connected</span>
       </div>
-      
       <div className="text-center order-1 md:order-2">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-100" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
           ENIGMA_X
         </h1>
-        {/* This is the updated line */}
         <p className="text-xs font-semibold text-slate-200 mt-1 leading-tight tracking-wider">
             Team ID: 93071
         </p>
       </div>
-      
       <div className="text-center md:text-right text-lg order-3 md:order-3">
         <span className="text-slate-300 font-semibold">Time:</span>
         <span className="text-[#00bcd4] ml-2 font-bold">02:15</span>
@@ -252,7 +259,7 @@ const SlamMap = (props) => {
     return () => cancelAnimationFrame(animationFrameId);
   }, [waypoint]);
   return (
-    <WidgetPanel title="SLAM Visualization" widgetName="slam" {...props}>
+    <WidgetPanel title="SLAM Visualization" widgetName="slam" description="Visualizes the robot's position and path in real-time using Simultaneous Localization and Mapping (SLAM). Click to set a dummy navigation waypoint." {...props}>
         <div className="w-full aspect-video">
             <canvas ref={canvasRef} onClick={handleCanvasClick} width="400" height="250" className="w-full h-full bg-[url('/images/map-grid.png')] bg-cover rounded-xl cursor-crosshair"></canvas>
         </div>
@@ -267,7 +274,7 @@ const FloorMaps = (props) => {
     w.document.write(`<body style="margin:0; background:black;"><img src="${src}" style="width:100%;height:auto;"></body>`);
   };
   return (
-    <WidgetPanel title="Floor Maps" widgetName="floor_maps" {...props}>
+    <WidgetPanel title="Floor Maps" widgetName="floor_maps" description="Displays pre-loaded floor plans for different levels. Click any map to open a larger, high-resolution view in a new tab." {...props}>
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {floorImages.map((img, i) => (
           <img
@@ -331,7 +338,7 @@ const NavigationReadings = (props) => {
     }, []);
 
     return (
-        <WidgetPanel title="Nav Readings" widgetName="nav_readings" {...props}>
+        <WidgetPanel title="Nav Readings" widgetName="nav_readings" description="Shows real-time data from the robot's core sensors. This includes the LIDAR scanner (for mapping) and internal system health metrics." {...props}>
             <div className="space-y-3">
                 {metrics.map(metric => (
                     <div key={metric.name}>
@@ -351,6 +358,30 @@ const NavigationReadings = (props) => {
         </WidgetPanel>
     );
 };
+
+// Updated RobotDescription Widget
+const RobotDescription = (props) => (
+  <WidgetPanel title="About " widgetName="description" {...props}>
+    <div className="flex flex-col md:flex-row gap-4 h-full items-center">
+      <img 
+        src="/images/robot.png" 
+        alt="ENIGMA_X Robot" 
+        className="w-24 h-24 object-contain" 
+      />
+      <ul className="text-sm text-slate-300 list-disc list-inside space-y-2 flex-1">
+        <li>
+          A versatile robotic assistant designed for adaptability across various domains.
+        </li>
+        <li>
+          Features a **Natural Language Interface**, allowing it to communicate and interact with users via its integrated Voice AI.
+        </li>
+        <li>
+          Powered by advanced AI for autonomous navigation (SLAM), with wonders of potential through further integration.
+        </li>
+      </ul>
+    </div>
+  </WidgetPanel>
+);
 
 const VoiceChatWidget = (props) => {
     const [log, setLog] = useState([]);
