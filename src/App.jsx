@@ -19,7 +19,7 @@ export default function App() {
   const [focusedWidget, setFocusedWidget] = useState(null);
 
   const col1Widgets = ['camera', 'performance', 'nav_readings'];
-  const col2Widgets = ['orientation', 'robot', 'slam', 'floor_maps'];
+  const col2Widgets = ['floor_maps', 'robot', 'slam']; // Reordered and removed 'orientation'
   const col3Widgets = ['voice', 'status', 'controls'];
 
   const getColumnClass = (colWidgets) => {
@@ -55,10 +55,10 @@ export default function App() {
         </div>
 
         <div className={`flex flex-col gap-6 transition-all duration-500 ${getColumnClass(col2Widgets)}`}>
-          <Orientation setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
+          {/* Floor Maps moved to top, Orientation removed */}
+          <FloorMaps setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
           <RobotImage setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
           <SlamMap setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
-          <FloorMaps setFocusedWidget={setFocusedWidget} focusedWidget={focusedWidget} />
         </div>
 
         <div className={`flex flex-col gap-6 transition-all duration-500 ${getColumnClass(col3Widgets)}`}>
@@ -188,21 +188,6 @@ const SystemPerformance = (props) => {
     );
 };
 
-const Orientation = (props) => {
-    const [degree, setDegree] = useState(42);
-    useEffect(() => { const interval = setInterval(() => setDegree(prev => (prev + Math.random() * 20 - 10 + 360) % 360), 2000); return () => clearInterval(interval); }, []);
-    return (
-        <WidgetPanel title="Orientation" widgetName="orientation" {...props}>
-             <div className="relative w-[250px] h-[250px] mx-auto border-4 border-[#b968c7] rounded-full flex items-center justify-center">
-                <div className="absolute w-1/2 h-1 bg-[#b968c7] origin-right transition-transform duration-500" style={{ transform: `rotate(${degree}deg)` }}></div>
-                <div className="absolute w-4 h-4 bg-[#00bcd4] rounded-full"></div>
-                <div className="absolute bottom-4 text-2xl text-[#b968c7]">{degree.toFixed(0)}°</div>
-            </div>
-        </WidgetPanel>
-    )
-};
-
-// Corrected RobotImage component with robust carousel
 const RobotImage = (props) => {
   const images = ["robot.png", "robot2.png"];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -219,7 +204,6 @@ const RobotImage = (props) => {
         <p className="text-sm font-bold text-slate-200 mb-2 text-center">
           This is our robot, made by us and still under build.
         </p>
-        {/* Using CSS Grid to stack images for a clean fade transition */}
         <div className="relative w-full flex-grow grid place-items-center">
             {images.map((imageName, index) => (
                 <img
@@ -316,6 +300,7 @@ const ManualControls = (props) => {
     )
 }
 
+// Updated NavigationReadings component
 const NavigationReadings = (props) => {
     const initialMetrics = [
         { name: "YDLIDAR X2", value: 0, max: 12 },
@@ -323,6 +308,10 @@ const NavigationReadings = (props) => {
         { name: "Path Confidence", value: 0, max: 100 },
         { name: "Obstacle Detection", value: 0, max: 50 },
         { name: "ReSpeaker Mic", value: 0, max: 12 },
+        { name: "Battery Health", value: 0, max: 100 },
+        { name: "Motor Temp (Left)", value: 0, max: 90 },
+        { name: "Motor Temp (Right)", value: 0, max: 90 },
+        { name: "Network Latency (ms)", value: 0, max: 200 },
     ];
     const [metrics, setMetrics] = useState(initialMetrics);
 
