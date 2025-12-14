@@ -5,7 +5,10 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 // ---SETUP---
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
-const modelIdentifier = "gemini-2.0-flash";
+
+// UPDATED: Changed model to gemini-2.5-flash as requested.
+// If this throws a 404, try "gemini-2.0-flash-exp" or "gemini-1.5-flash"
+const modelIdentifier = "gemini-2.5-flash"; 
 const voiceModel = genAI.getGenerativeModel({ model: modelIdentifier });
 
 const generateDummyData = () => {
@@ -427,7 +430,8 @@ const VoiceChatWidget = (props) => {
             const text = response.text();
             appendLog('bot', text || '[No response]');
         } catch (e) {
-            appendLog('bot', '[Error contacting server]');
+            console.error("Gemini API Error:", e);
+            appendLog('bot', '[Error contacting server - Check Console/Model Name]');
         } finally { 
             setStatus('Idle'); 
         }
